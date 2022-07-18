@@ -1,0 +1,90 @@
+x-environment:
+  &COMMON_ENVIRONMENT
+  ENVIRONMENT: DEVELOPMENT
+  PROXY_URL: http://localhost
+  HS_ISSUER: http://localhost/
+  HS_KEY: secret
+  AUTH0_MGMT_CLIENT_ID: "doesnotmatter"
+  AUTH0_MGMT_CLIENT_SECRET: "shhh"
+  AUTH0_AUTHZ_CLIENT_ID: "doesnotmatter"
+  AUTH0_AUTHZ_CLIENT_SECRET: "shhh"
+  AUTH0_AUTHZ_WEBTASK_URL: "doesnotmatter"
+  AUTH0_CLIENT_ID: "doesnotmatter"
+  AUTH0_AUDIENCE: "http://localhost/"
+  NONCUSTOM_AUTH0_DOMAIN: "http://wiremock:8080"
+  AUTH0_CUSTOM_DOMAIN: "dev"
+  DISABLE_CREATE_USER_IN_AUTH0: "True"
+  AUTH0_HS_KEY: "secret"
+  TOKEN_URL: "http://wiremock:8080/oauth/token"
+  REDIS_INSTALLED: "false"
+  REDIS_HOST: localhost
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: any
+  CUSTOMER_CODE: STAGING
+  LOG_LEVEL: DEBUG
+  LOG_FORMAT: COLOUR
+  SERVER_TIMEZONE: Europe/London
+  SMTP_HOST: fake-smtp
+  SMTP_AUTH_PASS: pass
+  SMTP_AUTH_USER: user
+  EMAIL_SENDER: "sender@domain.com"
+  DISABLE_EMAIL_SEND: "false"
+
+services:
+  dhos-notifications-integration-tests:
+    container_name: "dhos-notifications-integration-tests"
+    build:
+      context: ./
+      args:
+        - PIP_EXTRA_INDEX_URL
+    environment:
+      <<: *COMMON_ENVIRONMENT
+      BEHAVE_ARGS: ${BEHAVE_ARGS:-}
+      REPORT_PORTAL_URL: ${REPORT_PORTAL_URL:-}
+      REPORT_PORTAL_TOKEN: ${REPORT_PORTAL_TOKEN:-}
+      REPORT_PORTAL_PROJECT: ${REPORT_PORTAL_PROJECT:-}
+      ENVIRONMENT: ${ENVIRONMENT:-}
+      RELEASE: ${RELEASE:-}
+    command: >
+      bash -c "wait-for-it fake-smtp:587 -t 60 --strict
+      && behave --no-capture --no-logcapture ${BEHAVE_ARGS:-}"
+    depends_on:
+      "dhos-notifications-api":
+        condition: service_healthy
+      "wiremock":
+        condition: service_healthy
+
+  dhos-notifications-api:
+    container_name: "dhos-notifications-api"
+    build:
+      context: ..
+      args:
+        - GEMFURY_DOWNLOAD_KEY
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    command: >-
+      bash -c "python -m dhos_notifications_api"
+    healthcheck:
+      test: curl -f http://localhost:5000/running || false
+      interval: 3s
+      retries: 40
+      start_period: 10s
+
+  fake-smtp:
+    container_name: "fake-smtp"
+    image: reachfive/fake-smtp-server
+    command: ["node", "index.js", "--smtp-port", "587"]
+    ports:
+      - "587:587"
+      - "1080:1080"
+
+  wiremock:
+    container_name: "wiremock"
+    image: rodolpheche/wiremock:2.25.1
+    command: ["--local-response-templating", "--record-mappings", "--verbose"]
+    healthcheck:
+      test: "curl --location --request POST 'http://localhost:8080/__admin/mappings' || false"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s

@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "she-dhos-notifications-api"
+version = "0.0.1"
+description = "Notifications API to manage external notifications in DHOS"
+authors = ["Jon Daly <jonathan.daly@sensynehealth.com>"]
+keywords = ["Notifications", "DHOS"]
+repository = "https://github.com/draysontechnologies/dhos-notifications-api"
+
+[[tool.poetry.source]]
+name = "sensynehealth"
+url = "https://pypi.fury.io/sensynehealth/"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+auth0-api-client = "1.*"
+she-logging = "1.*"
+flask-batteries-included = {version = "3.*", extras = ["apispec"]}
+
+[tool.poetry.dev-dependencies]
+bandit = "*"
+black = "*"
+coloredlogs = "*"
+coverage = "*"
+isort = "*"
+mock = "*"
+mypy = "*"
+pytest = "*"
+pytest-dhos = {version = "*", extras=["fbi"]}
+pytest-flask = "*"
+pytest-mock = "*"
+requests_mock = "*"
+safety = "*"
+tox = "*"
+types-PyYAML = "*"
+types-mock = "*"
+types-requests = "*"
+
+[tool.mypy]
+namespace_packages=true
+ignore_missing_imports=false
+disallow_untyped_defs=true
+
+[[tool.mypy.overrides]]
+module = [
+    "requests_mock",
+    "pytest",
+    "environs",
+    "jose",
+    "waitress",
+    "connexion",
+    "pytest_mock",
+    "apispec.*",
+    "apispec_webframeworks.*",
+    "sadisplay"
+]
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+known_third_party = ["_pytest", "apispec", "apispec_webframeworks", "auth0_api_client", "behave", "click", "clients", "connexion", "environs", "faker", "flask", "flask_batteries_included", "marshmallow", "mock", "pytest", "pytest_mock", "reporting", "reportportal_behave", "requests", "she_logging", "waitress", "werkzeug", "yaml"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]

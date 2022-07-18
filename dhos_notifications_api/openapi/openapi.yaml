@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  description: The DHOS Notifications API is responsible for connecting to external
+    communication channels.
+  title: DHOS Notifications API
+  version: 1.0.0
+paths:
+  /running:
+    get:
+      summary: Verify service is running
+      description: Verifies that the service is running. Used for monitoring in kubernetes.
+      tags:
+      - monitoring
+      responses:
+        '200':
+          description: If we respond, we are running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  running:
+                    type: boolean
+                    example: true
+      operationId: flask_batteries_included.blueprint_monitoring.app_running
+  /version:
+    get:
+      summary: Get version information
+      description: Get the version number, circleci build number, and git hash.
+      tags:
+      - monitoring
+      responses:
+        '200':
+          description: Version numbers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  circle:
+                    type: string
+                    example: '1234'
+                  hash:
+                    type: string
+                    example: 366c204
+      operationId: flask_batteries_included.blueprint_monitoring.app_version
+  /dhos/v1/email:
+    post:
+      summary: Send email
+      description: Send email e.g. to new clinician user
+      tags:
+      - email
+      requestBody:
+        description: Details containing email address and message type
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSendRequest'
+              x-body-name: email_details
+      responses:
+        '201':
+          description: Email created and sent
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_notifications_api.blueprint_api.send_email_to_clinician
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: HTTP response code
+          example: 404
+        message:
+          type: string
+          description: Message attached to response
+          example: Not Found
+      required:
+      - code
+      description: An error response in json format
+    EmailSendRequest:
+      type: object
+      properties:
+        email_address:
+          type: string
+          description: Email address
+          example: john.roberts@mail.com
+        email_type:
+          type: string
+          enum:
+          - WELCOME_EMAIL
+          description: Email type
+          example: WELCOME_EMAIL
+      required:
+      - email_address
+      - email_type
+      title: Email send request data
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Bad or malformed request was received
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: Service or dependent resource not available
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
