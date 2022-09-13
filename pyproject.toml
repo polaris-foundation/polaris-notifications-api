@@ -1,14 +1,10 @@
 [tool.poetry]
-name = "she-dhos-notifications-api"
+name = "dhos-notifications-api"
 version = "0.0.1"
-description = "Notifications API to manage external notifications in DHOS"
+description = "Notifications API to manage external notifications in Polaris"
 authors = ["Jon Daly <jonathan.daly@sensynehealth.com>"]
-keywords = ["Notifications", "DHOS"]
-repository = "https://github.com/draysontechnologies/dhos-notifications-api"
-
-[[tool.poetry.source]]
-name = "sensynehealth"
-url = "https://pypi.fury.io/sensynehealth/"
+keywords = ["Notifications", "Polaris"]
+repository = "https://github.com/polaris-foundations/polaris-notifications-api"
 
 [tool.poetry.dependencies]
 python = "^3.9"
