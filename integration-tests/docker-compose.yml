@@ -35,8 +35,6 @@ services:
     container_name: "dhos-notifications-integration-tests"
     build:
       context: ./
-      args:
-        - PIP_EXTRA_INDEX_URL
     environment:
       <<: *COMMON_ENVIRONMENT
       BEHAVE_ARGS: ${BEHAVE_ARGS:-}
@@ -58,8 +56,6 @@ services:
     container_name: "dhos-notifications-api"
     build:
       context: ..
-      args:
-        - GEMFURY_DOWNLOAD_KEY
     environment:
       <<: *COMMON_ENVIRONMENT
     command: >-
