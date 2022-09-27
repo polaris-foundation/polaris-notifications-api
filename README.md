@@ -39,23 +39,11 @@ docker run <tag>
      -->
 
 <!-- markdown-swagger -->
- Endpoint                                   | Method | Auth? | Description                                                                                                                                                                                                                    
- ------------------------------------------ | ------ | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- `/running`                                 | GET    | No    | Verifies that the service is running. Used for monitoring in kubernetes.                                                                                                                                                       
- `/version`                                 | GET    | No    | Get the version number, circleci build number, and git hash.                                                                                                                                                                   
- `/dhos/v1/patient/{patient_id}/activation` | POST   | Yes   | Create a new activation for a patient. Responds with a shortened URL and a one-time-pin, to be used once to validate the activation.                                                                                           
- `/dhos/v1/patient/{patient_id}/activation` | GET    | Yes   | Responds with a list of activations created for the specified patient UUID.                                                                                                                                                    
- `/dhos/v1/patient/{patient_id}/jwt`        | GET    | No    | Responds with a valid patient JWT. Requires the `x-authorisation-code` header containing an authorisation code acquired by validating a patient activation.                                                                    
- `/dhos/v1/clinician`                       | POST   | Yes   | Create a clinician object, only to be used for storing clinician login details. Not to be confused with the clinician object in the Polaris Users API.                                                                         
- `/dhos/v1/clinician/{clinician_id}`        | PATCH  | Yes   | Update a clinician object, only to be used for storing clinician login details.                                                                                                                                                
- `/dhos/v1/clinician/jwt`                   | GET    | Yes   | Responds with a valid clinician JWT. Requires a device JWT for authorisation.                                                                                                                                                  
- `/dhos/v1/device`                          | POST   | Yes   | Create a known device containing details including location and name.                                                                                                                                                          
- `/dhos/v1/device`                          | GET    | Yes   | Responds with a list of known devices, containing details such as location and name.                                                                                                                                           
- `/dhos/v1/device/{device_id}`              | GET    | Yes   | Get details of the known device with the specified UUID.                                                                                                                                                                       
- `/dhos/v1/device/{device_id}`              | PATCH  | Yes   | Update details of the known device with the specified UUID.                                                                                                                                                                    
- `/dhos/v1/device/{device_id}/activation`   | POST   | Yes   | Create a new activation for a known device. Responds with an activation code, to be used once to validate the activation.                                                                                                      
- `/dhos/v1/device/{device_id}/jwt`          | GET    | No    | Responds with a valid device JWT. Requires the `x-authorisation-code` header containing a code acquired by validating a device activation.                                                                                     
- `/dhos/v1/activation/{activation_code}`    | POST   | No    | Validate ('activate') a previously-created activation for a patient or device. Requires the one-time-PIN (OTP) provided when the activation was created. Responds with a valid authorisation code to be used to retrieve a JWT.
+ Endpoint         | Method | Auth? | Description                                                             
+ ---------------- | ------ | ----- | ------------------------------------------------------------------------
+ `/running`       | GET    | No    | Verifies that the service is running. Used for monitoring in kubernetes.
+ `/version`       | GET    | No    | Get the version number, circleci build number, and git hash.            
+ `/dhos/v1/email` | POST   | No    | Send email e.g. to new clinician user                                   
 <!-- /markdown-swagger -->
 
 ## Requirements
